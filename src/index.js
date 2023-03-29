@@ -27,7 +27,7 @@ app.use(express.static(publicDirPath));
 io.on("connection", (socket) => {
   socket.on("sendMessage", (message, callback) => {
     const user = getUser((id = socket.id));
-    if (!user) console.log("whoops");
+    if (!user) return console.log("whoops");
     const filter = new Filter();
     if (filter.isProfane(message)) return callback("Profanity is not allowed");
     io.to(user.room).emit("message", generateMessage(user.username, message));
@@ -60,12 +60,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendLocation", (coords, callback) => {
-    const { username, room } = getUser(socket.id);
+    const user = getUser(socket.id);
+    if (!user) return console.log("whoops");
     const { latitude, longitude } = coords;
-    io.to(room).emit(
+    io.to(user.room).emit(
       "location",
       generateLocationMessage(
-        username,
+        user.username,
         `https://google.com/maps?q=${latitude},${longitude}`
       )
     );
