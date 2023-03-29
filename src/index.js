@@ -60,12 +60,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendLocation", (coords, callback) => {
-    const { username, room } = getUser(socket.id);
+    const user = getUser(socket.id);
     const { latitude, longitude } = coords;
-    io.to(room).emit(
+    io.to(user.room).emit(
       "location",
       generateLocationMessage(
-        username,
+        user.username,
         `https://google.com/maps?q=${latitude},${longitude}`
       )
     );
